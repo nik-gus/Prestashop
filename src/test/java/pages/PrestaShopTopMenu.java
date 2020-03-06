@@ -1,3 +1,5 @@
+package pages;
+
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -10,29 +12,28 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class PrestashopTest {
+public class Prestashop {
     static WebDriver driver;
 
     @BeforeClass
     public static void startup() {
         driver = new ChromeDriver();
-        driver.get("http://demo.prestashop.com");
+        driver.get("http://localhost:8001");
     }
 
     @Test
-    public static void signIn() {
-        WebDriverWait wait = new WebDriverWait(driver, 10);
-//
-        wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("framelive"));
-        System.out.println(" navigetat till rätt frame??????");
+    public void openSignInPage() {
 
+        WebDriverWait wait = new WebDriverWait(driver, 15);
+//
+        //wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("framelive"));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText("Sign in"))).click();
-        System.out.println("Efter wait");
+
     }
 
     @AfterClass
     public static void cleanup() {
-        driver.quit();
+        //driver.quit();
     }
 }
 //    @BeforeClass
