@@ -1,106 +1,174 @@
-import com.google.common.collect.Ordering;
-import org.junit.*;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.Select;
-import pages.*;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
+import pages.bottom.BottomMenu;
+import pages.cart.CartPage;
+import pages.clothes.ClothesPage;
+import pages.clothes.Size;
+import pages.contact.ContactPage;
+import pages.createAccount.CreateAccountPage;
+import pages.login.LoginPage;
+import pages.newProducts.NewProductsPage;
+import pages.order.OrderPage;
+import pages.start.StartPage;
+import pages.top.TopMenu;
+import utilities.CommonVerification;
+import utilities.ProductListHeader;
 
-import java.util.ArrayList;
-import java.util.List;
+import static pages.bottom.BottomMenu.getBottomMenu;
+import static pages.cart.CartPage.getCartPage;
+import static pages.clothes.ClothesPage.*;
+import static pages.contact.ContactPage.getContactUsPage;
+import static pages.createAccount.CreateAccountPage.getCreateAccountPage;
+import static pages.login.LoginPage.*;
+import static pages.newProducts.NewProductsPage.getNewProductsPage;
+import static pages.newProducts.NewProductsPage.newProductsHeader;
+import static pages.order.OrderPage.getOrderPage;
+import static pages.start.StartPage.getStartPage;
+import static pages.top.TopMenu.getTopMenu;
+import static utilities.CommonVerification.getCommonVerification;
 
-public class PrestaShopE2ETests {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class E2ETests extends BaseTestClass {
+    TopMenu top = getTopMenu();
+    BottomMenu bottom = getBottomMenu();
+    StartPage start = getStartPage();
+    CreateAccountPage createAccount = getCreateAccountPage();
+    LoginPage login = getLoginPage();
+    ContactPage contact = getContactUsPage();
+    NewProductsPage newProducts = getNewProductsPage();
+    ClothesPage clothes = getClothesPage();
+    CartPage cart = getCartPage();
+    OrderPage order = getOrderPage();
+    CommonVerification common = getCommonVerification();
 
-    static WebDriver driver =  new ChromeDriver();
-    //static String firstName, lastName, password;
-    static String testEmail;
+    static String testEmail = "mail12@mailinator.com";
 
 
-    @BeforeClass
-    public static void setup() {
-        driver.get("http://localhost:8001");
-        loadTestData();
-    }
-
-    private static void loadTestData() {
-        testEmail = "mail@mailinator.com";
-    }
-
-    @Before
-    public void goHome() {
-        PrestaShopTopMenu.findHomeButton(driver).click();
-    }
-
-    /* User Story 1: som en användare vill jag skapa ett konto så att jag kan handla snabbare */
+    /*  User Story 1: Som en användare vill jag skapa ett konto så att jag kan handla snabbare  */
     @Test
-    public void createAccount() {
-        PrestaShopTopMenu.findSignInButton(driver).click();
-        PrestaShopLogIn.findCreateAccountButton(driver).click();
-        PrestaShopCreateAccount.findRadioButtonMr(driver).click();
-        PrestaShopCreateAccount.findFirstName(driver).sendKeys("Tolvan" + Keys.ENTER);
-        PrestaShopCreateAccount.findLastName(driver).sendKeys("Tolvansson" + Keys.ENTER);
-        PrestaShopCreateAccount.findEmail(driver).sendKeys(testEmail +Keys.ENTER);
-        PrestaShopCreateAccount.findPassword(driver).sendKeys("Tolvan12" +Keys.ENTER);
-        PrestaShopCreateAccount.findAgreeToTerms(driver). click();
-        PrestaShopCreateAccount.findSaveButton(driver).click();
-        Assert.assertEquals("Tolvan Tolvansson", PrestaShopTopMenu.findUserName(driver).getText());
+    public void test1_createAccount() {
+        top.act()
+                .selectSignInButton();
+        common.verifyIsDisplayed(noAccountLink());
+
+        login.act()
+                .selectCreateAccountLink();
+        common.verifyIsDisplayed(customerForm());
+
+        createAccount.act()
+                .selectGenderMr()
+                .enterFirstName("Tolvan")
+                .enterLastName("Tolvansson")
+                .enterEmail(testEmail)
+                .enterPassword("Tolvan12")
+                .selectAgreeToTerms()
+                .selectSaveButton();
+
+        top.verify()
+                .userLoggedIn("Tolvan Tolvansson");
     }
 
     /* User story 2: som en användare vill jag signa up på nyhetsbrevet så att jag kan ta del av nyheter */
     @Test
-    public void subscribeNewsletter() {
-        PrestaShopStart.findSubscribeField(driver).sendKeys(testEmail +Keys.ENTER);
-        Assert.assertTrue(PrestaShopStart.findSubscribeMessage(driver).contains("successfully subscribed"));
+    public void test2_subscribeNewsletter() {
+        bottom.act()
+                .enterSubscribeEmail(testEmail);
+        bottom.verify()
+                .verifySubscription();
     }
 
     /* User story 3: Som en epileptiker  vill jag kontakta Webmaster och klaga på färgvalen på my store-länken */
     @Test
-    public void messageWebmaster() {
-        PrestaShopTopMenu.findContactButton(driver).click();
-        Assert.assertEquals("Contact us", driver.getTitle());
-        WebElement dropDown = PrestaShopContactUs.findSubjectDropDown(driver);
-        Select select = new Select(dropDown);
-        select.selectByVisibleText("Webmaster");
-        Assert.assertEquals("1", dropDown.getAttribute("value"));
+    public void test3_sendMessageToWebmaster() {
+        top.act()
+                .selectContactButton();
+        common.verifyPageTitle("Contact us");
 
-        WebElement emailField = PrestaShopContactUs.findEmailField(driver);
-        /* utan clear() nedan läggs emailadressen in dubbelt.  */
-        emailField.clear();
-        emailField.sendKeys(testEmail);
-        emailField.submit();
-        PrestaShopContactUs.findMessageTextArea(driver).sendKeys("I'm getting dizzy!");
-        PrestaShopContactUs.findSendButton(driver).click();
-        Assert.assertEquals("Your message has been successfully sent to our team.", PrestaShopContactUs.findMessageConfirmation(driver).getText());
+        contact.act()
+                .selectSubjectWebmaster();
+        contact.verify()
+                .webmasterIsSelected();
+
+        contact.act()
+                .enterEmail(testEmail)
+                .enterMessage("I'm getting dizzy!")
+                .selectSendButton();
+        contact.verify()
+                .verifyMessageConfirmation();
     }
 
-    /* User story: Som en återkommande kund vill jag se nyainkomna varor, sorterade efter lågt pris
-     * för att hålla mig uppdaterad om sortimentet */
+    /* User story 4: Som en återkommande kund vill jag se nyainkomna varor, sorterade efter lågt pris
+     * för att hålla mig uppdaterad om lågprissortimentet */
     @Test
-    public void browseNewProductsSortedByPriceAsc() throws InterruptedException {
-        PrestaShopStart.findNewProductLink(driver).click();
-        PrestaShopNewProducts.findSortByDropDown(driver).click();
-        PrestaShopNewProducts.findSortByPriceAscLink(driver).click();
-        /*
-        Fulhack för att kolla att produkterna har sorterats i pris-ordning.
-        Plockar ut priset från varje artikel in i en separat lista (priceList)
-        och kollar att den listan är i korrekt ordning.
-         */
-        List<WebElement> articles = PrestaShopNewProducts.findArticlesSortedByPrice(driver);
-        List<Double> priceList = new ArrayList<>();
-        articles.stream()
-                .map(a -> a.getText())
-                .mapToDouble(a -> Double.parseDouble(a.substring(a.indexOf('£') + 1, a.indexOf('£') +6)))
-                .forEach(priceList::add);
-        Assert.assertTrue(Ordering.<Double> natural().isOrdered(priceList));
+    public void test4_browseNewProductsSortedByPriceAsc() {
+        bottom.act()
+                .selectNewProductsLink();
+        common.verifyHeader(newProductsHeader(), ProductListHeader.NEW_PRODUCTS)
+               .verifyIsDisplayed(firstArticle()); //Verifierar att minst 1 artikel existerar - Testet fallerar.
+
+        newProducts.act()
+                .selectSortBy()
+                .selectSortByPriceAsc();
+        newProducts.verify()
+                .verifySortOrderPriceAsc();
     }
 
+    /* User story: As a medium sized male I want to buy a black Hummingbird t-shirt so that all chicks will dig me */
+    @Test
+    public void test5_purchaseClothesManMediumSizeHummingbird() {
+//        top.act()
+//                .selectSignInButton();
+//        login.act()
+//                .enterSignInEmail(testEmail)
+//                .enterSignInPassword("Tolvan12");
+        top.verify()
+                .userLoggedIn("Tolvan Tolvansson");
 
-    /* User story 4: Som en shop-a-holic vill jag kunna köpa en onödig vara för att tillfredställa mitt beroende */
+        top.act()
+                .selectClothes();
 
+//        common .verifyHeader(clothesHeader(), ProductListHeader.CLOTHES)
+//                .verifyIsDisplayed(clothesBreadcrumb());
 
-    @AfterClass
-    public static void tearDown() {
-        driver.quit();
+        clothes.act()
+                .selectMen()
+                .filterSize(Size.MEDIUM);
+
+        common.verifyPageTitle("Men")
+                .verifyIsDisplayed(menBreadcrumb())
+                .verifyText("Size: M", sizeMFilter()) //är rätt filter aktivt
+                .verifyIsDisplayed(firstArticle()); //visas minst 1 artikel
+
+        clothes.act()
+                .selectArticleOfClothingByName("Hummingbird")
+                .sizeM()
+                .colorBlack()
+                .addToBasket();
+
+        clothes.verify()
+                .productIsAddedToBasket();
+
+        clothes.act()
+                .proceedToCart();
+
+        cart.act()
+                .proceedToCheckout();
+
+        order.act()
+                .enterAddress("Tolvgatan 12")
+                .enterCity("Tolvstad")
+                .enterPostalCode("1212")
+                .selectContinue()
+                .confirmShipping()
+                .payByBankWire()
+                .agreeToTerms()
+                .placeOrder();
+
+        order.verify()
+                .orderConfirmed();
+
     }
+
+    //TODO: ev generell Articles-klass?
 }
