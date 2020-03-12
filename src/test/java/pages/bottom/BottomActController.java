@@ -24,4 +24,8 @@ public class BottomActController {
                 .click();
     }
 
+    public void selectOrders() {
+        driver.findElement(By.cssSelector("#footer_account_list > li:nth-child(2) > a"))
+                .click();
+    }
 }

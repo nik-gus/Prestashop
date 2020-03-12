@@ -14,7 +14,7 @@ public class ContactVerifyController {
     private WebDriver driver = getChromeDriver();
     private WebDriverWait wait = getWebDriverWait();
 
-    public ContactVerifyController verifyMessageConfirmation () {
+    public ContactVerifyController messageConfirmation() {
         String confirmation = driver.findElement(By.cssSelector("#content > section > form > div > ul > li")).getText();
         Assert.assertEquals("Your message has been successfully sent to our team.", confirmation);
         return this;

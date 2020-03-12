@@ -2,7 +2,8 @@ package utilities;
 
 public enum ProductListHeader {
 
-    CLOTHES("CLOTHES"), NEW_PRODUCTS("NEW PRODUCTS");
+    CLOTHES("CLOTHES"), NEW_PRODUCTS("NEW PRODUCTS"); //ACCESSORIES, ART, ON SALE, BEST SELLERS
+
 
     private String value;
 

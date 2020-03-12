@@ -7,6 +7,7 @@ import pages.clothes.ClothesPage;
 import pages.clothes.Size;
 import pages.contact.ContactPage;
 import pages.createAccount.CreateAccountPage;
+import pages.history.HistoryPage;
 import pages.login.LoginPage;
 import pages.newProducts.NewProductsPage;
 import pages.order.OrderPage;
@@ -20,6 +21,7 @@ import static pages.cart.CartPage.getCartPage;
 import static pages.clothes.ClothesPage.*;
 import static pages.contact.ContactPage.getContactUsPage;
 import static pages.createAccount.CreateAccountPage.getCreateAccountPage;
+import static pages.history.HistoryPage.getHistoryPage;
 import static pages.login.LoginPage.*;
 import static pages.newProducts.NewProductsPage.getNewProductsPage;
 import static pages.newProducts.NewProductsPage.newProductsHeader;
@@ -40,9 +42,10 @@ public class E2ETests extends BaseTestClass {
     ClothesPage clothes = getClothesPage();
     CartPage cart = getCartPage();
     OrderPage order = getOrderPage();
+    HistoryPage history = getHistoryPage();
     CommonVerification common = getCommonVerification();
 
-    static String testEmail = "mail12@mailinator.com";
+    static String testEmail = "mail27@mailinator.com";
 
 
     /*  User Story 1: Som en användare vill jag skapa ett konto så att jag kan handla snabbare  */
@@ -95,17 +98,20 @@ public class E2ETests extends BaseTestClass {
                 .enterMessage("I'm getting dizzy!")
                 .selectSendButton();
         contact.verify()
-                .verifyMessageConfirmation();
+                .messageConfirmation();
     }
 
+    /*Uppdatering: nedanstående test fallerar efter en tid. Jag kör prestashop lokalt
+        och märkte att typ 2 veckor efter nedladdning finns inga nya produkter kvar.
+         Antar att Prestashop kollar nya produkter utifrån det datum produkterna skapades i min lokala databas..? */
     /* User story 4: Som en återkommande kund vill jag se nyainkomna varor, sorterade efter lågt pris
      * för att hålla mig uppdaterad om lågprissortimentet */
-    @Test
+    //@Test
     public void test4_browseNewProductsSortedByPriceAsc() {
         bottom.act()
                 .selectNewProductsLink();
         common.verifyHeader(newProductsHeader(), ProductListHeader.NEW_PRODUCTS)
-               .verifyIsDisplayed(firstArticle()); //Verifierar att minst 1 artikel existerar - Testet fallerar.
+                .verifyIsDisplayed(firstArticle()); //Verifierar att minst 1 artikel existerar, testet fallerar efter ca 2 veckor
 
         newProducts.act()
                 .selectSortBy()
@@ -117,19 +123,14 @@ public class E2ETests extends BaseTestClass {
     /* User story: As a medium sized male I want to buy a black Hummingbird t-shirt so that all chicks will dig me */
     @Test
     public void test5_purchaseClothesManMediumSizeHummingbird() {
-//        top.act()
-//                .selectSignInButton();
-//        login.act()
-//                .enterSignInEmail(testEmail)
-//                .enterSignInPassword("Tolvan12");
         top.verify()
                 .userLoggedIn("Tolvan Tolvansson");
 
         top.act()
                 .selectClothes();
 
-//        common .verifyHeader(clothesHeader(), ProductListHeader.CLOTHES)
-//                .verifyIsDisplayed(clothesBreadcrumb());
+        common .verifyHeader(clothesHeader(), ProductListHeader.CLOTHES)
+                .verifyIsDisplayed(clothesBreadcrumb());
 
         clothes.act()
                 .selectMen()
@@ -137,8 +138,8 @@ public class E2ETests extends BaseTestClass {
 
         common.verifyPageTitle("Men")
                 .verifyIsDisplayed(menBreadcrumb())
-                .verifyText("Size: M", sizeMFilter()) //är rätt filter aktivt
-                .verifyIsDisplayed(firstArticle()); //visas minst 1 artikel
+                .verifyText("Size: M", sizeMFilter()) //är korrekt filter aktivt?
+                .verifyIsDisplayed(firstArticle()); //visas minst 1 artikel?
 
         clothes.act()
                 .selectArticleOfClothingByName("Hummingbird")
@@ -170,5 +171,23 @@ public class E2ETests extends BaseTestClass {
 
     }
 
-    //TODO: ev generell Articles-klass?
+    /* User story 6: Som en otålig kund vill jag skynda på leveransen av min order */
+    @Test
+    public void test6_addMessageToOrder() {
+        top.verify()
+                .userLoggedIn("Tolvan Tolvansson");
+
+        bottom. act()
+                .selectOrders();
+        common.verifyPageTitle("Order history");
+
+        history.act()
+                .selectDetails()
+                .selectFirstProduct()
+                .enterMessage("Ship it already!")
+                .send();
+
+        history.verify()
+                .messageIsSent();
+    }
 }
