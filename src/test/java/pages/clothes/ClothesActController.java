@@ -50,7 +50,7 @@ public class ClothesActController {
 
     public void proceedToCart() {
         driver.findElement(By.xpath("//a[@class='btn btn-primary']"))
-                .click();;
+                .click();
     }
 
 }
