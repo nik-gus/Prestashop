@@ -14,6 +14,7 @@ public class ContactPage {
         this.verify = verify;
     }
 
+    //static factory method
     public static ContactPage getContactUsPage() {
         return new ContactPage(new ContactActController(), new ContactVerifyController());
     }

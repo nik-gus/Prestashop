@@ -16,6 +16,7 @@ public class ClothesPage {
         this.verify = verify;
     }
 
+    //static factory method
     public static ClothesPage getClothesPage() {
         return new ClothesPage(new ClothesActController(), new ClothesVerifyController());
     }

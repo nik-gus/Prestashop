@@ -45,7 +45,7 @@ public class E2ETests extends BaseTestClass {
     HistoryPage history = getHistoryPage();
     CommonVerification common = getCommonVerification();
 
-    static String testEmail = "mail27@mailinator.com";
+    static String testEmail = "tolvans_email@mailinator.com";
 
 
     /*  User Story 1: Som en användare vill jag skapa ett konto så att jag kan handla snabbare  */
@@ -106,7 +106,7 @@ public class E2ETests extends BaseTestClass {
          Antar att Prestashop kollar nya produkter utifrån det datum produkterna skapades i min lokala databas..? */
     /* User story 4: Som en återkommande kund vill jag se nyainkomna varor, sorterade efter lågt pris
      * för att hålla mig uppdaterad om lågprissortimentet */
-    //@Test
+   // @Test
     public void test4_browseNewProductsSortedByPriceAsc() {
         bottom.act()
                 .selectNewProductsLink();
