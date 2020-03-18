@@ -45,7 +45,7 @@ public class E2ETests extends BaseTestClass {
     HistoryPage history = getHistoryPage();
     CommonVerification common = getCommonVerification();
 
-    static String testEmail = "tolvans_email@mailinator.com";
+    static String testEmail = "tolvans_email5@mailinator.com";
 
 
     /*  User Story 1: Som en användare vill jag skapa ett konto så att jag kan handla snabbare  */
@@ -78,7 +78,7 @@ public class E2ETests extends BaseTestClass {
         bottom.act()
                 .enterSubscribeEmail(testEmail);
         bottom.verify()
-                .verifySubscription();
+                .subscriptionSucceeded();
     }
 
     /* User story 3: Som en epileptiker  vill jag kontakta Webmaster och klaga på färgvalen på my store-länken */

@@ -14,7 +14,7 @@ public class BottomVerifyController {
     private WebDriver driver = getChromeDriver();
     private WebDriverWait wait = getWebDriverWait();
 
-    public BottomVerifyController verifySubscription() {
+    public BottomVerifyController subscriptionSucceeded() {
         Assert.assertTrue(driver.findElement(By.xpath("//p[@class='alert alert-success']"))
                 .getText()
                 .contains("successfully subscribed"));
